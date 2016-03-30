@@ -22,6 +22,11 @@ class ClientServiceTest extends FunSuite with ClientServiceApi{
       assert(response.getVersion === 6)
   }
 
+  test("index from json file"){
+    val response = clientService.addFromJsonFile
+    assert(response.hasFailures === false)
+  }
+
   test("search"){
     val result = clientService.search("price","2800")
     assert(result.getHits.totalHits === 1)
@@ -33,8 +38,23 @@ class ClientServiceTest extends FunSuite with ClientServiceApi{
   }
 
   test("add"){
-    val result = clientService.add("kunal","xyz",1000,"6")
-    assert(Integer.parseInt(result.getId) === 6)
+    val result = clientService.add("kk tt","kk",10000,"2")
+    assert(Integer.parseInt(result.getId) === 2)
+  }
+
+  test("post filter"){
+    val result = clientService.postFilter("","")
+    assert(result.getHits.getMaxScore === 1.287682F)
+  }
+
+  test("multiple add"){
+    val res = clientService.addBig
+    assert(true)
+  }
+
+  test("write to external file"){
+    val result = clientService.writeToFile
+    assert(true)
   }
 
 }

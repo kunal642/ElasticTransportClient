@@ -12,7 +12,6 @@ import org.elasticsearch.plugin.deletebyquery.DeleteByQueryPlugin
   */
 class EsManager {
 
-
   private val port = 9300
 
   private val nodes = List("localhost")
