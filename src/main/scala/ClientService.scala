@@ -30,11 +30,11 @@ trait ClientServiceApi {
     client.prepareSearch("library").setTypes("books").setQuery(QueryBuilders.termQuery(s"$query",s"$value")).execute().actionGet()
   }
 
-  def update(id:String,field:String,value:Int):UpdateResponse ={
+  def update(id:String,field:String,value:Any):UpdateResponse ={
     client.prepareUpdate("library","books",id).setDoc(field, value).execute().actionGet()
   }
 
-  def postFilter(must:String,mustNot:String) = {
+  def postFilter() = {
     val postfilter = QueryBuilders.boolQuery().must(QueryBuilders.matchQuery("price",3800))
     client.prepareSearch("library").setTypes("books").setQuery(QueryBuilders.boolQuery()
       .must(QueryBuilders.nestedQuery("author",QueryBuilders.matchQuery("author.first","kunal")))).setPostFilter(postfilter).execute().actionGet()
@@ -74,14 +74,13 @@ trait ClientServiceApi {
   }
     """
 
-    client.prepareIndex("library", "books", id).setSource(jsonString)
-      .get()
+    client.prepareIndex("library", "books", id).setSource(jsonString).get()
   }
 
   def addBig = {
     val bulkRequest:BulkRequestBuilder = client.prepareBulk()
     for (id <- 6 to 10000) {
-      bulkRequest.add(client.prepareIndex("library", "books").setSource(
+      bulkRequest.add(client.prepareIndex("library", "books",id.toString).setSource(
         s"""
   {
     "title": "title-$id",
@@ -116,10 +115,10 @@ trait ClientServiceApi {
   }
 
   def delete(id:Int) = {
-    val delQuery =  QueryBuilders.boolQuery.must(QueryBuilders.termsQuery("_id",id))
+    val delQuery =  QueryBuilders.termsQuery("id",id)
     val delResponse: DeleteByQueryResponse = DeleteByQueryAction.INSTANCE
       .newRequestBuilder(client)
-      .setIndices("library")
+      .setIndices("library").setTypes("books")
       .setQuery(delQuery).execute().actionGet()
     delResponse
   }
